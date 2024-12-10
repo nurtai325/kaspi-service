@@ -1,1 +1,4 @@
 .env
+.git
+postgres_data
+*.log

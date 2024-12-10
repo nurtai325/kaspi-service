@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Клиенттер</title>
+	<script src="/tailwind"></script>
+</head>
+
+<body>
+	<div class="w-screen h-screen">
+		<div class="w-full mt-4 flex">
+			<h3 class="text-lg font-semibold ml-4 mr-auto text-slate-800">Клиенттер</h3>
+			<a class="text-white bg-blue-500 p-1 rounded mr-5" href="/clients/create">Жаңа клиент</a>
+		</div>
+		<div
+			class="relative flex flex-col w-full h-full overflow-scroll text-gray-700 bg-white shadow-md rounded-lg bg-clip-border p-4 pt-2">
+			<table class="w-full text-left table-auto min-w-max">
+				<thead>
+					<tr>
+						{{ range .Columns }}
+						<th class="p-4 border-b border-slate-300 bg-slate-200">
+							<p class="block text-sm font-normal leading-none text-slate-500">
+								{{ . }}
+							</p>
+						</th>
+						{{ end }}
+					</tr>
+				</thead>
+				<tbody>
+					{{ range .Clients }}
+					<tr class="hover:bg-slate-50">
+						<td class="p-4 border-b border-slate-200">
+							<p class="block text-sm text-slate-800">
+								{{ .Name }}
+							</p>
+						</td>
+						<td class="p-4 border-b border-slate-200">
+							<p class="block text-sm text-slate-800">
+								{{ .Phone }}
+							</p>
+						</td>
+						<td class="p-4 border-b border-slate-200">
+							<p class="block text-sm text-slate-800 expires">
+								{{ .Expires }}
+							</p>
+						</td>
+						<td class="py-3 px-6 flex">
+							<form action="/clients/extend" method="POST" class="flex items-center">
+								<input type="hidden" name="id" value="{{.Id}}">
+								<input type="number" name="duration" min="1" required
+									class="border border-gray-300 rounded p-1 mr-2" placeholder="Cан жазыңыз">
+								<select name="unit" required class="border border-gray-300 rounded p-1 mr-2">
+									<option value="months">Ай</option>
+									<option value="days">Күн</option>
+								</select>
+								<button type="submit"
+									class="bg-blue-500 text-white font-bold py-1 px-3 rounded hover:bg-blue-600">
+									Ұзарту
+								</button>
+							</form>
+							<form action="/clients/cancel" method="POST" class="flex items-center ml-2">
+								<input type="hidden" name="id" value="{{.Id}}">
+								<button type="submit"
+									class="bg-red-500 text-white font-bold py-1 px-3 rounded hover:bg-red-600">
+									Өшіру
+								</button>
+							</form>
+						</td>
+						<td class="p-4 border-b border-slate-200">
+							<p class="block text-sm text-slate-800">
+								{{ if .Connected }} Иә {{ else }} Жоқ {{ end }}
+							</p>
+						</td>
+						<td class="py-3 px-6">
+							<div class="flex">
+								<form action="/clients/connect" method="POST" class="flex items-center">
+									<input type="hidden" name="phone" value="{{.Phone}}">
+									<input type="hidden" name="id" value="{{.Id}}">
+									<button type="submit"
+										class="bg-blue-500 text-white font-bold py-1 px-3 rounded hover:bg-blue-600">
+										Қосу
+									</button>
+								</form>
+							</div>
+						</td>
+					</tr>
+					{{ end }}
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<script>
+		const dates = document.querySelectorAll('.expires');
+
+		dates.forEach(date => {
+			const unformatted = date.innerHTML;
+			date.innerHTML = unformatted.split(".")[0]
+		});
+	</script>
+</body>
+
+<html>
