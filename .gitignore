@@ -2,3 +2,5 @@
 .git
 postgres_data
 *.log
+temp
+*.qr.png

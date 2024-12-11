@@ -20,13 +20,11 @@ func Register() {
 	http.HandleFunc("/favicon.ico", HandleFav)
 	http.HandleFunc("/login", HandleLogin)
 
-	// TODO: uncomment this
-	// handlers.WithAuth("/", handlers.HandleClients)
-	// handlers.WithAuth("/clients/create", handlers.HandleClientsCreate)
-	http.HandleFunc("/", HandleClients)
-	http.HandleFunc("/clients/create", HandleClientsCreate)
-	http.HandleFunc("/clients/extend", HandleClientExtend)
-	http.HandleFunc("/clients/cancel", HandleClientsCancel)
+	withAuth("/", HandleClients)
+	withAuth("/clients/create", HandleClientsCreate)
+	withAuth("/clients/extend", HandleClientExtend)
+	withAuth("/clients/cancel", HandleClientsCancel)
+	withAuth("/clients/connect", HandleClientsConnect)
 }
 
 func withAuth(path string, next http.HandlerFunc) {

@@ -9,10 +9,12 @@ import (
 
 	"github.com/nurtai325/kaspi-service/internal/models"
 	"github.com/nurtai325/kaspi-service/internal/repositories"
+	"github.com/nurtai325/kaspi-service/internal/whatsapp"
 )
 
 var (
 	clientsTempl       = "clients.html"
+	qrTempl            = "qr.html"
 	clientsCreateTempl = "clients_create.html"
 	columns            = []string{"Аты", "Номер", "Төленді дейін", "", "Whatsapp-қа қосылған", ""}
 )
@@ -149,4 +151,27 @@ func HandleClientsCancel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func HandleClientsConnect(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, ErrMethodNotAllowed.Error(), http.StatusMethodNotAllowed)
+	}
+
+	r.ParseForm()
+	formId := r.Form.Get("id")
+	clientId, err := strconv.Atoi(formId)
+	if err != nil {
+		err = fmt.Errorf("client id is not a number: %w", err)
+		log.Println(newErr(r, err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	data, err := whatsapp.GetQr(repositories.NewClient(), clientId)
+	if err != nil {
+		log.Println(newErr(r, err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	Execute(w, r, qrTempl, data)
 }

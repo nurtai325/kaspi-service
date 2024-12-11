@@ -13,26 +13,34 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+var (
+	container *sqlstore.Container
+)
+
 type Messenger struct {
 	container *sqlstore.Container
 }
 
 func NewMessenger(dbConn *sql.DB) *Messenger {
-	container := sqlstore.NewWithDB(dbConn, "postgres", nil)
-	err := container.Upgrade()
-	if err != nil {
-		log.Panic(fmt.Errorf("error making new sql whatsapp container: %w", err))
+	if container == nil {
+		newContainer := sqlstore.NewWithDB(dbConn, "postgres", nil)
+		err := newContainer.Upgrade()
+		if err != nil {
+			log.Panic(fmt.Errorf("error making new sql whatsapp container: %w", err))
+		}
+		container = newContainer
 	}
 	return &Messenger{container: container}
 }
 
 func (m *Messenger) Message(ctx context.Context, jid, to, text string) error {
+	log.Println(jid, to)
 	parsedJid, err := types.ParseJID(jid)
 	if err != nil {
 		return fmt.Errorf("invalid whatsapp device jid: %s: %w", jid, err)
 	}
 	device, err := m.container.GetDevice(parsedJid)
-	if err != nil {
+	if err != nil || device == nil {
 		return fmt.Errorf("can't find whatsapp device jid: %s: %w", jid, err)
 	}
 	client := whatsmeow.NewClient(device, nil)

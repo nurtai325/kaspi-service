@@ -74,8 +74,7 @@ func (c *Client) Extend(ctx context.Context, id, months, days int) error {
 	var expirationDate time.Time
 	err := r.Scan(&expirationDate)
 	if err != nil {
-		err = fmt.Errorf("error extending client %d expiration date: %w", id, err)
-		return err
+		return fmt.Errorf("error extending client %d expiration date: %w", id, err)
 	}
 
 	if expirationDate.UTC().Before(time.Now().UTC()) {
@@ -86,8 +85,7 @@ func (c *Client) Extend(ctx context.Context, id, months, days int) error {
 	statement = "UPDATE clients SET expires = $1 WHERE id = $2;"
 	_, err = c.conn.ExecContext(ctx, statement, expirationDate.UTC(), id)
 	if err != nil {
-		err = fmt.Errorf("error extending client %d expiration date: %w", id, err)
-		return err
+		return fmt.Errorf("error extending client %d expiration date: %w", id, err)
 	}
 	return nil
 }
@@ -96,8 +94,16 @@ func (c *Client) Cancel(ctx context.Context, id int) error {
 	statement := "UPDATE clients SET expires = $1 WHERE id = $2;"
 	_, err := c.conn.ExecContext(ctx, statement, time.Now().UTC(), id)
 	if err != nil {
-		err = fmt.Errorf("error cancelling client subscription: %w", err)
-		return err
+		return fmt.Errorf("error cancelling client subscription: %w", err)
+	}
+	return nil
+}
+
+func (c *Client) ConnectWh(ctx context.Context, id int, jid string) error {
+	statement := "UPDATE clients SET connected = $1, jid = $2 WHERE id = $3;"
+	_, err := c.conn.ExecContext(ctx, statement, true, jid, id)
+	if err != nil {
+		return fmt.Errorf("error updating client connected in db client: %d jid: %s: %w", id, jid, err)
 	}
 	return nil
 }

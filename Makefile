@@ -11,5 +11,6 @@ test: $(src)
 	go mod tidy
 	go build -o test cmd/test/main.go
 
+.PHONY: clean
 clean:
 	rm server test

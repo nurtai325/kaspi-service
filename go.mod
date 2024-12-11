@@ -4,6 +4,7 @@ go 1.22.2
 
 require (
 	github.com/jackc/pgx/v5 v5.7.1
+	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	go.mau.fi/whatsmeow v0.0.0-20241202173457-b2dd543e5721
 	golang.org/x/crypto v0.29.0
 	google.golang.org/protobuf v1.35.2
