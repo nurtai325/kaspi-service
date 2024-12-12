@@ -6,3 +6,4 @@ temp
 *.qr.png
 app_state
 cert
+*.pem
