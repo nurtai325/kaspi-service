@@ -59,7 +59,7 @@ func startServer(conf config.Config) {
 		log.Panic(err)
 	}
 	log.Printf("Starting http server on port: %s", conf.PORT)
-	err = http.ListenAndServe(":"+conf.PORT, nil)
+	err = http.ListenAndServeTLS(":"+conf.PORT, "./cert/certificate.crt", "./cert/private.key", nil)
 	if err != nil {
 		err = fmt.Errorf("error http server fail: %w", err)
 		log.Panic(err)

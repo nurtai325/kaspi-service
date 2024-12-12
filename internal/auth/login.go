@@ -44,9 +44,7 @@ func Login(w http.ResponseWriter, r *http.Request, phone, password string) error
 		Name:     sessionCookieName,
 		Value:    sessionId,
 		MaxAge:   3600 * 24 * 14,
-		// TODO: uncomment this
-		// Secure:   true,
-		Secure: false,
+		Secure:   true,
 		HttpOnly: true,
 		SameSite: http.SameSiteDefaultMode,
 	})

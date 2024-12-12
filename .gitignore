@@ -5,3 +5,4 @@ postgres_data
 temp
 *.qr.png
 app_state
+cert
