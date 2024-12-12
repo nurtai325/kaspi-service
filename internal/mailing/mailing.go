@@ -34,8 +34,8 @@ func Run(clientRepo repositories.Client, messenger *whatsapp.Messenger) {
 		if err != nil {
 			log.Println(err)
 		}
-		err = completedOrders(ctx, messenger)
-		if err != nil {
+		errs := completedOrders(ctx, messenger)
+		for _, err := range errs {
 			log.Println(err)
 		}
 		cycleRunningTime = time.Now().Sub(start)
@@ -61,7 +61,6 @@ func newOrders(ctx context.Context, clientRepo repositories.Client, messenger *w
 			return err
 		}
 		for _, order := range orders {
-			log.Println(client, order)
 			ordersQ.add(order.Id, models.QueuedOrder{
 				ClientName:  client.Name,
 				ClientPhone: client.Phone,
@@ -80,15 +79,21 @@ func newOrders(ctx context.Context, clientRepo repositories.Client, messenger *w
 	return nil
 }
 
-func completedOrders(ctx context.Context, messenger *whatsapp.Messenger) error {
+func completedOrders(ctx context.Context, messenger *whatsapp.Messenger) []error {
 	ordersQ.mu.Lock()
 	copiedOrdersQueue := make(map[string]models.QueuedOrder, len(ordersQ.queue))
 	maps.Copy(copiedOrdersQueue, ordersQ.queue)
 	ordersQ.mu.Unlock()
+	errs := make([]error, 0)
 	for orderId, orderQ := range copiedOrdersQueue {
+		if orderQ.Failed > 2 {
+			continue
+		}
 		status, err := kaspi.GetOrderStatus(ctx, orderQ.Token, orderId)
 		if err != nil {
-			return fmt.Errorf("getting order %s status: %w", orderId, err)
+			err = fmt.Errorf("getting order %s status: %w", orderId, err)
+			errs = handleOrderQErr(errs, err, orderId, orderQ)
+			continue
 		}
 		if failedOrder(status) {
 			ordersQ.mu.Lock()
@@ -101,13 +106,23 @@ func completedOrders(ctx context.Context, messenger *whatsapp.Messenger) error {
 		textMessage := completedOrderMessage(orderQ.ClientName, orderQ.Order)
 		err = messenger.Message(ctx, orderQ.ClientJid, orderQ.Order.CustomerPhone, textMessage)
 		if err != nil {
-			return fmt.Errorf("sending message: %w", err)
+			err = fmt.Errorf("sending message: %w", err)
+			errs = handleOrderQErr(errs, err, orderId, orderQ)
+			continue
 		}
 		ordersQ.mu.Lock()
 		delete(ordersQ.queue, orderId)
 		ordersQ.mu.Unlock()
 	}
-	return nil
+	return errs
+}
+
+func handleOrderQErr(errs []error, err error, orderId string, orderQ models.QueuedOrder) []error {
+	ordersQ.mu.Lock()
+	orderQ.Failed += 1
+	ordersQ.queue[orderId] = orderQ
+	ordersQ.mu.Unlock()
+	return append(errs, err)
 }
 
 func failedOrder(status kaspi.OrderStatus) bool {

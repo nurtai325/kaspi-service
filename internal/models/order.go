@@ -14,6 +14,7 @@ type QueuedOrder struct {
 	ClientPhone string
 	ClientJid   string
 	Token       string
+	Failed      int
 	Order       Order
 }
 

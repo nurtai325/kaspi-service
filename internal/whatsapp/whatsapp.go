@@ -34,7 +34,6 @@ func NewMessenger(dbConn *sql.DB) *Messenger {
 }
 
 func (m *Messenger) Message(ctx context.Context, jid, to, text string) error {
-	log.Println(jid, to)
 	parsedJid, err := types.ParseJID(jid)
 	if err != nil {
 		return fmt.Errorf("invalid whatsapp device jid: %s: %w", jid, err)

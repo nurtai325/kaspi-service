@@ -16,6 +16,7 @@ func HandleTailwind(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		log.Println(err)
+		return
 	}
 	addCacheHeader(w, 31536000)
 	w.Write(contents)

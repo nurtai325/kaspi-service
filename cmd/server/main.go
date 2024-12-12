@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
 	"sync"
+	"syscall"
 
 	"github.com/nurtai325/kaspi-service/internal/config"
 	"github.com/nurtai325/kaspi-service/internal/db"
@@ -16,19 +19,35 @@ import (
 
 func main() {
 	log.SetFlags(log.LstdFlags | log.LUTC | log.Llongfile)
+	err := mailing.RecoverState()
+	if err != nil {
+		log.Panic(err)
+	}
 	conf := config.New()
-	clientRepo := repositories.NewClient()
-	messenger := whatsapp.NewMessenger(db.Conn(conf))
-
 	var wg sync.WaitGroup
-	wg.Add(2)
+	wg.Add(3)
 	go func() {
+		clientRepo := repositories.NewClient()
+		messenger := whatsapp.NewMessenger(db.Conn(conf))
 		mailing.Run(clientRepo, messenger)
+		log.Println("Starting mailing to clients")
 		wg.Done()
 	}()
 	go func() {
 		startServer(conf)
 		wg.Done()
+	}()
+	go func() {
+		c := make(chan os.Signal, 1)
+		signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+		<-c
+		log.Println("application interrupted. saving state")
+		err := mailing.SaveState()
+		if err != nil {
+			log.Println(fmt.Errorf("error saving app state: %w", err))
+		}
+		log.Println("application state saved")
+		os.Exit(0)
 	}()
 	wg.Wait()
 }
