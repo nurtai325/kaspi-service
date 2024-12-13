@@ -24,6 +24,7 @@ func Register() {
 	withAuth("/clients/create", HandleClientsCreate)
 	withAuth("/clients/extend", HandleClientExtend)
 	withAuth("/clients/cancel", HandleClientsCancel)
+	withAuth("/clients/delete", HandleClientsDelete)
 	withAuth("/clients/connect", HandleClientsConnect)
 }
 

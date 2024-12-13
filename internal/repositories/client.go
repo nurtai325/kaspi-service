@@ -99,6 +99,15 @@ func (c *Client) Cancel(ctx context.Context, id int) error {
 	return nil
 }
 
+func (c *Client) Delete(ctx context.Context, id int) error {
+	statement := "DELETE FROM clients WHERE id = $1;"
+	_, err := c.conn.ExecContext(ctx, statement, id)
+	if err != nil {
+		return fmt.Errorf("error deleting client: %w", err)
+	}
+	return nil
+}
+
 func (c *Client) ConnectWh(ctx context.Context, id int, jid string) error {
 	statement := "UPDATE clients SET connected = $1, jid = $2 WHERE id = $3;"
 	_, err := c.conn.ExecContext(ctx, statement, true, jid, id)

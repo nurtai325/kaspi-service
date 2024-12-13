@@ -153,6 +153,31 @@ func HandleClientsCancel(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
+func HandleClientsDelete(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, ErrMethodNotAllowed.Error(), http.StatusMethodNotAllowed)
+	}
+
+	r.ParseForm()
+	formId := r.Form.Get("id")
+	clientId, err := strconv.Atoi(formId)
+	if err != nil {
+		err = fmt.Errorf("client id is not a number: %w", err)
+		log.Println(newErr(r, err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	clientRepo := repositories.NewClient()
+	err = clientRepo.Delete(r.Context(), clientId)
+	if err != nil {
+		log.Println(newErr(r, err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
 func HandleClientsConnect(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, ErrMethodNotAllowed.Error(), http.StatusMethodNotAllowed)
