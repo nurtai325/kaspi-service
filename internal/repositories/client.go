@@ -57,7 +57,7 @@ func (c *Client) all(ctx context.Context, whereClause string, args ...any) ([]mo
 }
 
 func (c *Client) Create(ctx context.Context, name, phone, token string) error {
-	statement := "INSERT INTO clients(name, phone, token, expires, jid, connected) VALUES($1, $2, $3, $4, $5);"
+	statement := "INSERT INTO clients(name, phone, token, expires, jid, connected) VALUES($1, $2, $3, $4, $5, $6);"
 	expires := time.Now().UTC()
 	connected := false
 	jid := ""
