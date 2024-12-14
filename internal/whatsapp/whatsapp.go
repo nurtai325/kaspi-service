@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"time"
 
 	"go.mau.fi/whatsmeow"
 	"go.mau.fi/whatsmeow/proto/waE2E"
@@ -48,12 +49,12 @@ func (m *Messenger) Message(ctx context.Context, jid, to, text string) error {
 		return fmt.Errorf("whatsapp client connect failure jid: %s: %w", jid, err)
 	}
 	defer client.Disconnect()
-	fmt.Println(client.IsLoggedIn())
+	time.Sleep(time.Second*5)
 	_, err = client.SendMessage(ctx, types.NewJID(to, types.DefaultUserServer), &waE2E.Message{
 		Conversation: proto.String(text),
 	})
 	if err != nil {
-		return fmt.Errorf("whatsapp message sending error jid: %s: %w", jid, err)
+		return fmt.Errorf("whatsapp message sending error jid: %s to: %s: %w", jid, to, err)
 	}
 	return nil
 }

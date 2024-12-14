@@ -47,13 +47,14 @@ func GetQr(clientRepo repositories.Client, id int) (pairingData, error) {
 					if err != nil {
 						log.Println(err)
 					}
+					time.Sleep(time.Second * 10)
 					cli.Disconnect()
 					return
 				}
 			}
 			log.Println(fmt.Errorf("qr channel closed unexpectedly"))
 		}(qrCh)
-		imagePath = fmt.Sprintf("/assets/%d-%d.qr.png", id, time.Now().UnixMilli())
+		imagePath = fmt.Sprintf("/assets/%d-%d.qr.png", id, time.Now().UnixNano())
 		err = qrcode.WriteFile(evt.Code, qrcode.Medium, 512, "."+imagePath)
 		if err != nil {
 			return pairingData{}, fmt.Errorf("error generating qr code image: %w", err)
