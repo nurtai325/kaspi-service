@@ -47,6 +47,7 @@ func GetQr(clientRepo repositories.Client, id int) (pairingData, error) {
 					if err != nil {
 						log.Println(err)
 					}
+					cli.Disconnect()
 					return
 				}
 			}
