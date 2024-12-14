@@ -55,7 +55,7 @@ func AllOrders(ctx context.Context, token string, from, to time.Time) ([]models.
 			ProductCode: productCode,
 			Customer:    fmt.Sprintf("%s %s", order.Attributes.Customer.FirstName, order.Attributes.Customer.LastName),
 			Entries:     entries,
-			CustomerPhone: order.Attributes.Customer.CellPhone,
+			CustomerPhone: "7"+order.Attributes.Customer.CellPhone,
 		})
 	}
 	return orders, nil
