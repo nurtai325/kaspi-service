@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	mailingIntervalMinutes = 20
+	mailingIntervalMinutes = 30
 )
 
 var (
@@ -71,7 +71,7 @@ func newOrders(ctx context.Context, clientRepo repositories.Client, messenger *w
 			textMessage := newOrderMessage(client, order)
 			err = messenger.Message(ctx, client.Jid, order.CustomerPhone, textMessage)
 			if err != nil {
-				err = errors.Join(ErrMailingRun, fmt.Errorf("error getting all kaspi orders for client %s %s: %w", client.Name, client.Phone, err))
+				err = errors.Join(ErrMailingRun, fmt.Errorf("client %s %s: %w", client.Name, client.Phone, err))
 				return err
 			}
 		}

@@ -47,6 +47,7 @@ func (m *Messenger) Message(ctx context.Context, jid, to, text string) error {
 	if err != nil {
 		return fmt.Errorf("whatsapp client connect failure jid: %s: %w", jid, err)
 	}
+	fmt.Println(client.IsLoggedIn())
 	_, err = client.SendMessage(ctx, types.NewJID(to, types.DefaultUserServer), &waE2E.Message{
 		Conversation: proto.String(text),
 	})
