@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	mailingIntervalMinutes = 60
+	mailingIntervalMinutes = 120
 )
 
 var (
