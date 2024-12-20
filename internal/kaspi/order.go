@@ -50,12 +50,12 @@ func AllOrders(ctx context.Context, token string, from, to time.Time) ([]models.
 			return nil, fmt.Errorf("fetching entries for order %s\n %w", order.Id, err)
 		}
 		orders = append(orders, models.Order{
-			Id:          order.Id,
-			Code:        order.Attributes.Code,
-			ProductCode: productCode,
-			Customer:    fmt.Sprintf("%s %s", order.Attributes.Customer.FirstName, order.Attributes.Customer.LastName),
-			Entries:     entries,
-			CustomerPhone: "7"+order.Attributes.Customer.CellPhone,
+			Id:            order.Id,
+			Code:          order.Attributes.Code,
+			ProductCode:   productCode,
+			Customer:      fmt.Sprintf("%s %s", order.Attributes.Customer.FirstName, order.Attributes.Customer.LastName),
+			Entries:       entries,
+			CustomerPhone: "7" + order.Attributes.Customer.CellPhone,
 		})
 	}
 	return orders, nil

@@ -28,6 +28,9 @@ func do(ctx context.Context, token, method, link string, parsedRes any) error {
 	httpClient := http.Client{}
 	res, err := httpClient.Do(req)
 	if err != nil || res.StatusCode < 200 || res.StatusCode >= 300 {
+		if res == nil || res.Body == nil {
+			return fmt.Errorf("request fail %s %s %s \n%w", method, link, token, err)
+		}
 		contents, _ := io.ReadAll(res.Body)
 		return fmt.Errorf("request fail %s %s %s \n%w \n%s", method, link, token, err, contents)
 	}

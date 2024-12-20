@@ -3,6 +3,7 @@
 postgres_data
 *.log
 temp
+temp.html
 *.qr.png
 app_state
 cert

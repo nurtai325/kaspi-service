@@ -90,6 +90,7 @@ func completedOrders(ctx context.Context, messenger *whatsapp.Messenger) []error
 			continue
 		}
 		status, err := kaspi.GetOrderStatus(ctx, orderQ.Token, orderId)
+		fmt.Println(status)
 		if err != nil {
 			err = fmt.Errorf("getting order %s status: %w", orderId, err)
 			errs = handleOrderQErr(errs, err, orderId, orderQ)
